@@ -1,27 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>♻ Smart Recycle | Login</title>
+  <title>Smart Recycle Login</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="center-screen">
 
 <div class="login-card">
-  <h1> ♻ Smart Recycle </h1>
+  <h2>♻ Smart Recycle</h2>
+  <p class="subtitle">Earn rewards for recycling</p>
 
   <div class="toggle">
-    <button id="signinBtn" class="active" onclick="setMode('signin')">Sign In</button>
-    <button id="signupBtn" onclick="setMode('signup')">Sign Up</button>
+    <button onclick="switchMode('login')" id="loginBtn">Login</button>
+    <button onclick="switchMode('signup')" id="signupBtn" class="active">Sign Up</button>
   </div>
 
-  <p id="modeTitle">Welcome Back 👋</p>
+  <input type="text" id="phone" placeholder="Phone Number">
+  <input type="password" id="password" placeholder="Password">
 
-  <input type="tel" id="phone" placeholder="📱 Phone number">
-
-  <button id="mainBtn" onclick="submitAuth()">Sign In</button>
-
-  <p id="msg"></p>
+  <button onclick="submitAuth()">Continue</button>
+  <p onclick="forgotPassword()" style="font-size:12px;cursor:pointer;">Forgot Password?</p>
 </div>
 
 <script src="script.js"></script>
