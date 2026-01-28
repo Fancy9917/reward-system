@@ -11,14 +11,16 @@
   <p class="subtitle">Earn rewards for recycling</p>
 
   <div class="toggle">
-    <button onclick="switchMode('login')" id="loginBtn">Login</button>
-    <button onclick="switchMode('signup')" id="signupBtn" class="active">Sign Up</button>
+    <button onclick="setMode('signin')" id="loginBtn">Login</button>
+    <button onclick="setMode('signup')" id="signupBtn" class="active">Sign Up</button>
   </div>
+
+  <p id="modeTitle">Create Account ✨</p>
 
   <input type="text" id="phone" placeholder="Phone Number">
   <input type="password" id="password" placeholder="Password">
 
-  <button onclick="submitAuth()">Continue</button>
+  <button id="mainBtn" onclick="submitAuth()">Sign Up</button>
   <p onclick="forgotPassword()" style="font-size:12px;cursor:pointer;">Forgot Password?</p>
 </div>
 
