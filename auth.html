@@ -8,18 +8,18 @@
 
 <div class="login-card">
   <h2>♻ Smart Recycle</h2>
-  <p id="modeTitle">Create Account ✨</p>
+  <p class="subtitle">Earn rewards for recycling</p>
 
   <div class="toggle">
-    <button onclick="setMode('signin')">Login</button>
-    <button onclick="setMode('signup')" class="active">Sign Up</button>
+    <button onclick="switchMode('login')" id="loginBtn">Login</button>
+    <button onclick="switchMode('signup')" id="signupBtn" class="active">Sign Up</button>
   </div>
 
   <input type="text" id="phone" placeholder="Phone Number">
   <input type="password" id="password" placeholder="Password">
 
-  <button id="mainBtn" onclick="submitAuth()">Sign Up</button>
-  <p onclick="forgotPassword()" style="font-size:12px;">Forgot Password?</p>
+  <button onclick="submitAuth()">Continue</button>
+  <p onclick="forgotPassword()" class="forgot">Forgot Password?</p>
 </div>
 
 <script src="script.js"></script>
