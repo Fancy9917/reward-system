@@ -1,96 +1,137 @@
 let mode = "signup";
 
-function switchMode(m) {
-  mode = m;
+function switchMode(type) {
+  mode = type;
   document.getElementById("loginBtn").classList.remove("active");
   document.getElementById("signupBtn").classList.remove("active");
-  document.getElementById(m + "Btn").classList.add("active");
+
+  if (type === "login") {
+    document.getElementById("loginBtn").classList.add("active");
+  } else {
+    document.getElementById("signupBtn").classList.add("active");
+  }
 }
 
 function submitAuth() {
   const phone = document.getElementById("phone").value;
   const password = document.getElementById("password").value;
 
-  if (!phone || !password) return alert("Enter phone & password");
+  if (!phone || !password) {
+    alert("Enter phone and password");
+    return;
+  }
+
+  let users = JSON.parse(localStorage.getItem("users") || "{}");
 
   if (mode === "signup") {
-    if (localStorage.getItem(phone)) return alert("Account exists!");
+    if (users[phone]) {
+      alert("Account exists, please login");
+      return;
+    }
 
-    const user = { phone, password, points: 0, items: 0, cash: 0 };
-    localStorage.setItem(phone, JSON.stringify(user));
-    localStorage.setItem("currentUser", JSON.stringify(user));
-    location.href = "dashboard.html";
+    users[phone] = {
+      password: password,
+      points: 0,
+      items: 0
+    };
 
-  } else {
-    const user = JSON.parse(localStorage.getItem(phone));
-    if (!user || user.password !== password) return alert("Wrong login");
-
-    localStorage.setItem("currentUser", JSON.stringify(user));
-    location.href = "dashboard.html";
+    localStorage.setItem("users", JSON.stringify(users));
+    alert("Account created!");
   }
+
+  if (mode === "login") {
+    if (!users[phone] || users[phone].password !== password) {
+      alert("Wrong phone or password");
+      return;
+    }
+  }
+
+  localStorage.setItem("currentUser", phone);
+  window.location.href = "dashboard.html";
 }
 
 function forgotPassword() {
-  const phone = prompt("Enter phone number");
-  const user = JSON.parse(localStorage.getItem(phone));
-  if (!user) return alert("No account found");
-  alert("Your password is: " + user.password);
+  const phone = prompt("Enter your phone number");
+  let users = JSON.parse(localStorage.getItem("users") || "{}");
+
+  if (!users[phone]) {
+    alert("User not found");
+    return;
+  }
+
+  const newPass = prompt("Enter new password");
+  users[phone].password = newPass;
+  localStorage.setItem("users", JSON.stringify(users));
+  alert("Password updated!");
 }
+
+/* ---------------- DASHBOARD ---------------- */
 
 function loadDashboard() {
-  const user = JSON.parse(localStorage.getItem("currentUser"));
-  if (!user) location.href = "index.html";
-
-  document.getElementById("userPhone").innerText = "User: " + user.phone;
-  updateUI(user);
-}
-
-function simulateMachine() {
-  // Machine randomly sends data
-  let user = JSON.parse(localStorage.getItem("currentUser"));
-
-  const pointsEarned = Math.floor(Math.random() * 10) + 5;
-  user.points += pointsEarned;
-  user.items += 1;
-
-  // 30 points = 30 Baht
-  if (user.points >= 30) {
-    user.cash += 30;
-    alert("🎉 You earned 30 Baht reward!");
-    user.points -= 30;
+  const phone = localStorage.getItem("currentUser");
+  if (!phone) {
+    window.location.href = "index.html";
+    return;
   }
 
-  // Random gift
-  if (Math.random() > 0.7) {
-    alert("🎁 You won a random eco gift!");
-  }
+  let users = JSON.parse(localStorage.getItem("users"));
+  const user = users[phone];
 
-  localStorage.setItem(user.phone, JSON.stringify(user));
-  localStorage.setItem("currentUser", JSON.stringify(user));
-  updateUI(user);
-}
-
-function updateUI(user) {
+  document.getElementById("userPhone").innerText = "User: " + phone;
   document.getElementById("points").innerText = user.points;
   document.getElementById("items").innerText = user.items;
 
-  let progress = (user.points / 30) * 100;
-  document.getElementById("progressFill").style.width = progress + "%";
-
-  showBadges(user);
+  updateBadges(user.points);
+  updateProgress(user.points);
 }
 
-function showBadges(user) {
-  let list = document.getElementById("badgeList");
-  list.innerHTML = "";
+function simulateMachineInput() {
+  const phone = localStorage.getItem("currentUser");
+  let users = JSON.parse(localStorage.getItem("users"));
+  let user = users[phone];
 
-  if (user.items >= 1) list.innerHTML += "🥉 Plastic Starter<br>";
-  if (user.items >= 5) list.innerHTML += "🥈 Recycling Supporter<br>";
-  if (user.cash >= 30) list.innerHTML += "💰 Cash Reward Badge<br>";
-  if (user.items >= 10) list.innerHTML += "🏆 Green Hero<br>";
+  const randomPoints = Math.floor(Math.random() * 10) + 5;
+  user.points += randomPoints;
+  user.items += 1;
+
+  users[phone] = user;
+  localStorage.setItem("users", JSON.stringify(users));
+
+  alert("Machine added " + randomPoints + " points!");
+  loadDashboard();
+}
+
+function updateProgress(points) {
+  const progress = (points % 30) / 30 * 100;
+  document.getElementById("progressFill").style.width = progress + "%";
+}
+
+function updateBadges(points) {
+  const badgeList = document.getElementById("badgeList");
+  badgeList.innerHTML = "";
+
+  let rewards = [
+    { level: 30, reward: "💰 30 Baht Cash" },
+    { level: 60, reward: "🎁 Random Gift" },
+    { level: 100, reward: "🏆 Super Recycler Badge" }
+  ];
+
+  rewards.forEach(r => {
+    let div = document.createElement("div");
+    div.className = "badge";
+
+    if (points >= r.level) {
+      div.innerHTML = "✅ " + r.reward;
+    } else {
+      div.innerHTML = "🔒 Unlock at " + r.level + " points";
+      div.classList.add("locked");
+    }
+
+    badgeList.appendChild(div);
+  });
 }
 
 function logout() {
   localStorage.removeItem("currentUser");
-  location.href = "index.html";
+  window.location.href = "index.html";
 }
