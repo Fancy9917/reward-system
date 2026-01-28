@@ -1,77 +1,115 @@
-let mode = "signup";
+let mode = "signin";
 
-function switchMode(m) {
-  mode = m;
-  document.getElementById("loginBtn").classList.toggle("active", m==="login");
-  document.getElementById("signupBtn").classList.toggle("active", m==="signup");
+function setMode(selected) {
+  mode = selected;
+  document.getElementById("modeTitle").innerText =
+    selected === "signin" ? "Welcome Back 👋" : "Create Account ✨";
+  document.getElementById("mainBtn").innerText =
+    selected === "signin" ? "Sign In" : "Sign Up";
 }
 
+// SIGN UP / LOGIN
 function submitAuth() {
-  const phone = phone.value;
-  const pass = password.value;
-  let users = JSON.parse(localStorage.getItem("users")) || {};
+  const phone = document.getElementById("phone").value;
+  const password = document.getElementById("password").value;
+
+  if (!phone || !password) return alert("Enter phone & password");
+
+  const userData = JSON.parse(localStorage.getItem(phone));
 
   if (mode === "signup") {
-    if (users[phone]) return alert("User exists");
-    users[phone] = { password: pass, points: 0, plastic:0, aluminum:0, glass:0 };
-    localStorage.setItem("users", JSON.stringify(users));
+    if (userData) return alert("Account exists!");
+
+    const user = {
+      phone,
+      password,
+      points: 0,
+      badges: [],
+    };
+
+    localStorage.setItem(phone, JSON.stringify(user));
     alert("Account created!");
-  }
+  } else {
+    if (!userData || userData.password !== password)
+      return alert("Wrong phone or password!");
 
-  if (mode === "login") {
-    if (!users[phone] || users[phone].password !== pass) return alert("Wrong login");
     localStorage.setItem("currentUser", phone);
-    window.location = "dashboard.html";
+    window.location.href = "dashboard.html";
   }
 }
 
+// FORGOT PASSWORD
 function forgotPassword() {
-  const phone = prompt("Phone number:");
-  let users = JSON.parse(localStorage.getItem("users")) || {};
-  if (!users[phone]) return alert("Not found");
-  users[phone].password = prompt("New password:");
-  localStorage.setItem("users", JSON.stringify(users));
-  alert("Updated!");
+  const phone = document.getElementById("phone").value;
+  const newPass = prompt("Enter new password:");
+
+  if (!phone || !newPass) return;
+
+  const user = JSON.parse(localStorage.getItem(phone));
+  if (!user) return alert("Account not found");
+
+  user.password = newPass;
+  localStorage.setItem(phone, JSON.stringify(user));
+  alert("Password updated!");
 }
 
+// DASHBOARD LOAD
 function loadDashboard() {
   const phone = localStorage.getItem("currentUser");
-  let users = JSON.parse(localStorage.getItem("users"));
-  let user = users[phone];
+  if (!phone) return (window.location.href = "auth.html");
 
-  userPhone.innerText = phone;
-  points.innerText = user.points;
-  items.innerText = user.plastic + user.aluminum + user.glass;
-
-  let progress = (user.points % 100);
-  progressFill.style.width = progress + "%";
-
-  badgeList.innerHTML = `
-    <div class="badge">Plastic: ${user.plastic}</div>
-    <div class="badge">Aluminum: ${user.aluminum}</div>
-    <div class="badge">Glass: ${user.glass}</div>
-  `;
+  const user = JSON.parse(localStorage.getItem(phone));
+  document.getElementById("userPhone").innerText = phone;
+  updateUI(user);
 }
 
-function addReward(material) {
-  let phone = localStorage.getItem("currentUser");
-  let users = JSON.parse(localStorage.getItem("users"));
-  let user = users[phone];
+// ADD RANDOM POINTS
+function addPoints() {
+  const phone = localStorage.getItem("currentUser");
+  const user = JSON.parse(localStorage.getItem(phone));
 
-  let rewardTypes = ["Cash", "Coupon", "Bonus Points"];
-  let reward = rewardTypes[Math.floor(Math.random()*3)];
+  const randomPoints = Math.floor(Math.random() * 50) + 10;
+  user.points += randomPoints;
 
-  let value = Math.floor(Math.random()*20)+5;
-  user.points += value;
-  user[material] += 1;
+  checkBadges(user);
+  localStorage.setItem(phone, JSON.stringify(user));
+  updateUI(user);
 
-  localStorage.setItem("users", JSON.stringify(users));
-
-  alert(`🎉 Reward: ${reward} - ${value} Baht/Points`);
-  loadDashboard();
+  alert("You earned " + randomPoints + " points!");
 }
 
-function logout(){
+// BADGE SYSTEM
+function checkBadges(user) {
+  const rewards = [
+    { pts: 100, name: "฿10 Reward" },
+    { pts: 250, name: "฿25 Reward" },
+    { pts: 500, name: "Eco Hero Badge 🌱" },
+  ];
+
+  rewards.forEach((reward) => {
+    if (user.points >= reward.pts && !user.badges.includes(reward.name)) {
+      user.badges.push(reward.name);
+      alert("Unlocked: " + reward.name);
+    }
+  });
+}
+
+// UPDATE DASHBOARD UI
+function updateUI(user) {
+  document.getElementById("points").innerText = user.points;
+
+  const progress = Math.min((user.points / 500) * 100, 100);
+  document.getElementById("progressFill").style.width = progress + "%";
+
+  const badgeBox = document.getElementById("badgeList");
+  badgeBox.innerHTML = "";
+
+  user.badges.forEach((b) => {
+    badgeBox.innerHTML += `<div class="badge">${b}</div>`;
+  });
+}
+
+function logout() {
   localStorage.removeItem("currentUser");
-  window.location="auth.html";
+  window.location.href = "auth.html";
 }
