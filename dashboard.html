@@ -1,64 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Smart Recycle | Dashboard</title>
+  <title>Dashboard</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body onload="loadDashboard()">
 
 <header>
-  <h1>♻ Smart Recycle</h1>
+  <h2>🌱 My Rewards</h2>
   <p id="userPhone"></p>
 </header>
 
-<!-- SYSTEM STATUS -->
-<section class="status-box">
-  <div class="mascot">🤖</div>
-  <p>
-    Recycling is performed by the smart machine.<br>
-    Points and badges are updated automatically.
-  </p>
-</section>
-
-<!-- USER STATS -->
-<section class="dashboard">
+<div class="dashboard">
   <div class="card">
-    <h3>Total Points</h3>
+    <h3>⭐ Points</h3>
     <p id="points">0</p>
   </div>
   <div class="card">
-    <h3>Total Items</h3>
+    <h3>♻ Items</h3>
     <p id="items">0</p>
   </div>
-</section>
+</div>
 
-<!-- PROGRESS -->
-<section class="progress-box">
-  <h3>Progress to Next Reward</h3>
+<div class="progress-box">
+  <p>Reward Progress</p>
   <div class="progress-bar">
     <div id="progressFill"></div>
   </div>
-</section>
+</div>
 
-<!-- BADGES -->
-<section class="badges">
-  <h2>Achievement Badges</h2>
+<div class="badges">
+  <h3>🏅 Badges</h3>
+  <div id="badgeList"></div>
+</div>
 
-  <div id="plasticBadge" class="badge locked">
-    🧴 Plastic Hero <span>(0 / 5)</span>
-  </div>
-
-  <div id="aluminumBadge" class="badge locked">
-    🥫 Aluminum Saver <span>(0 / 3)</span>
-  </div>
-
-  <div id="glassBadge" class="badge locked">
-    🍾 Glass Guardian <span>(0 / 2)</span>
-  </div>
-
+<div style="padding:16px;">
+  <button onclick="addReward('plastic')">Plastic</button>
+  <button onclick="addReward('aluminum')">Aluminum</button>
+  <button onclick="addReward('glass')">Glass</button>
   <button class="logout" onclick="logout()">Logout</button>
-</section>
+</div>
 
 <script src="script.js"></script>
 </body>
