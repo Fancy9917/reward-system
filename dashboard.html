@@ -6,23 +6,20 @@
 </head>
 <body onload="loadDashboard()">
 
-<header class="header">
+<header>
   <h2>🌱 My Rewards</h2>
   <p id="userPhone"></p>
 </header>
 
 <div class="dashboard">
-
   <div class="card">
-    <h3>⭐ Total Points</h3>
+    <h3>⭐ Points</h3>
     <p id="points">0</p>
   </div>
-
   <div class="card">
-    <h3>♻ Total Items</h3>
+    <h3>♻ Items</h3>
     <p id="items">0</p>
   </div>
-
 </div>
 
 <div class="progress-box">
@@ -38,6 +35,8 @@
 </div>
 
 <div style="padding:16px;">
+  <!-- DEMO BUTTON (represents machine sending data) -->
+  <button onclick="simulateMachine()">Simulate Machine Input</button>
   <button class="logout" onclick="logout()">Logout</button>
 </div>
 
