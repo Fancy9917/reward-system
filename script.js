@@ -1,6 +1,6 @@
 let mode = "signup";
 
-// SWITCH LOGIN / SIGNUP MODE
+// SWITCH LOGIN / SIGNUP
 function setMode(selected) {
   mode = selected;
   document.getElementById("modeTitle").innerText =
@@ -18,19 +18,17 @@ function submitAuth() {
 
   let users = JSON.parse(localStorage.getItem("users")) || {};
 
-  // SIGN UP
   if (mode === "signup") {
-    if (users[phone]) return alert("Account already exists");
+    if (users[phone]) return alert("Account exists");
 
     users[phone] = { password, points: 0, plastic: 0, aluminum: 0, glass: 0 };
     localStorage.setItem("users", JSON.stringify(users));
-    alert("Account created! Please login.");
+    alert("Account created!");
     return;
   }
 
-  // LOGIN
   if (!users[phone] || users[phone].password !== password)
-    return alert("Wrong login details");
+    return alert("Wrong login");
 
   localStorage.setItem("currentUser", phone);
   window.location = "dashboard.html";
@@ -40,7 +38,6 @@ function submitAuth() {
 function forgotPassword() {
   const phone = prompt("Enter your phone number:");
   let users = JSON.parse(localStorage.getItem("users")) || {};
-
   if (!users[phone]) return alert("User not found");
 
   const newPass = prompt("Enter new password:");
@@ -66,15 +63,19 @@ function loadDashboard() {
   updateBadges(user);
 }
 
-// ADD REWARD
-function addReward(type) {
+// MACHINE INPUT SIMULATION
+function simulateMachineInput() {
   const phone = localStorage.getItem("currentUser");
   const users = JSON.parse(localStorage.getItem("users"));
   const user = users[phone];
 
+  const materials = ["plastic", "aluminum", "glass"];
+  const detected = materials[Math.floor(Math.random() * materials.length)];
+
   const pts = Math.floor(Math.random() * 10) + 5;
+
   user.points += pts;
-  user[type] += 1;
+  user[detected] += 1;
 
   localStorage.setItem("users", JSON.stringify(users));
 
@@ -85,13 +86,12 @@ function addReward(type) {
   updateProgress(user.points);
   updateBadges(user);
 
-  alert("+" + pts + " points earned!");
+  alert(`Machine detected: ${detected.toUpperCase()} ♻️\n+${pts} points`);
 }
 
-// PROGRESS BAR
+// PROGRESS
 function updateProgress(points) {
-  let percent = points % 100;
-  document.getElementById("progressFill").style.width = percent + "%";
+  document.getElementById("progressFill").style.width = (points % 100) + "%";
 }
 
 // BADGES
@@ -99,13 +99,13 @@ function updateBadges(user) {
   const badgeList = document.getElementById("badgeList");
   badgeList.innerHTML = "";
 
-  const badgeRules = [
+  const rules = [
     { name: "🌱 Plastic Starter", count: user.plastic, need: 3 },
     { name: "🥤 Aluminum Saver", count: user.aluminum, need: 3 },
-    { name: "🍾 Glass Guardian", count: user.glass, need: 3 },
+    { name: "🍾 Glass Guardian", count: user.glass, need: 3 }
   ];
 
-  badgeRules.forEach(b => {
+  rules.forEach(b => {
     const div = document.createElement("div");
     div.className = "badge " + (b.count >= b.need ? "" : "locked");
     div.innerText = `${b.name} (${b.count}/${b.need})`;
