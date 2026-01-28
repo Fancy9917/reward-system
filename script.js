@@ -1,82 +1,77 @@
-let mode = "signin";
+let mode = "signup";
 
-/* AUTH MODE */
-function setMode(m) {
+function switchMode(m) {
   mode = m;
-  document.getElementById("signinBtn").classList.toggle("active", m === "signin");
-  document.getElementById("signupBtn").classList.toggle("active", m === "signup");
-  document.getElementById("modeTitle").innerText =
-    m === "signin" ? "Welcome Back" : "Create New Account";
-  document.getElementById("mainBtn").innerText =
-    m === "signin" ? "Sign In" : "Sign Up";
-  document.getElementById("msg").innerText = "";
+  document.getElementById("loginBtn").classList.toggle("active", m==="login");
+  document.getElementById("signupBtn").classList.toggle("active", m==="signup");
 }
 
-/* LOGIN / SIGNUP */
 function submitAuth() {
-  const phone = document.getElementById("phone").value.trim();
-  const msg = document.getElementById("msg");
-
-  if (!phone) {
-    msg.innerText = "Phone number required";
-    return;
-  }
+  const phone = phone.value;
+  const pass = password.value;
+  let users = JSON.parse(localStorage.getItem("users")) || {};
 
   if (mode === "signup") {
-    if (localStorage.getItem(phone)) {
-      msg.innerText = "User already exists";
-      return;
-    }
-
-    localStorage.setItem(phone, JSON.stringify({
-      points: 0,
-      items: 0,
-      materials: { plastic: 0, aluminum: 0, glass: 0 }
-    }));
-  } else {
-    if (!localStorage.getItem(phone)) {
-      msg.innerText = "User not found";
-      return;
-    }
+    if (users[phone]) return alert("User exists");
+    users[phone] = { password: pass, points: 0, plastic:0, aluminum:0, glass:0 };
+    localStorage.setItem("users", JSON.stringify(users));
+    alert("Account created!");
   }
 
-  localStorage.setItem("currentUser", phone);
-  window.location.href = "dashboard.html";
+  if (mode === "login") {
+    if (!users[phone] || users[phone].password !== pass) return alert("Wrong login");
+    localStorage.setItem("currentUser", phone);
+    window.location = "dashboard.html";
+  }
 }
 
-/* LOAD USER DATA */
-const currentUser = localStorage.getItem("currentUser");
-
-if (currentUser && document.getElementById("points")) {
-  const data = JSON.parse(localStorage.getItem(currentUser));
-  document.getElementById("userPhone").innerText = "User: " + currentUser;
-  document.getElementById("points").innerText = data.points;
-  document.getElementById("items").innerText = data.items;
-  updateProgress(data.points);
-  updateBadges(data);
+function forgotPassword() {
+  const phone = prompt("Phone number:");
+  let users = JSON.parse(localStorage.getItem("users")) || {};
+  if (!users[phone]) return alert("Not found");
+  users[phone].password = prompt("New password:");
+  localStorage.setItem("users", JSON.stringify(users));
+  alert("Updated!");
 }
 
-/* BADGES */
-function updateBadges(data) {
-  updateBadge("plasticBadge", data.materials.plastic, 5);
-  updateBadge("aluminumBadge", data.materials.aluminum, 3);
-  updateBadge("glassBadge", data.materials.glass, 2);
+function loadDashboard() {
+  const phone = localStorage.getItem("currentUser");
+  let users = JSON.parse(localStorage.getItem("users"));
+  let user = users[phone];
+
+  userPhone.innerText = phone;
+  points.innerText = user.points;
+  items.innerText = user.plastic + user.aluminum + user.glass;
+
+  let progress = (user.points % 100);
+  progressFill.style.width = progress + "%";
+
+  badgeList.innerHTML = `
+    <div class="badge">Plastic: ${user.plastic}</div>
+    <div class="badge">Aluminum: ${user.aluminum}</div>
+    <div class="badge">Glass: ${user.glass}</div>
+  `;
 }
 
-function updateBadge(id, count, goal) {
-  const badge = document.getElementById(id);
-  badge.innerHTML = badge.innerHTML.split("(")[0] + `(${count} / ${goal})</span>`;
-  if (count >= goal) badge.classList.remove("locked");
+function addReward(material) {
+  let phone = localStorage.getItem("currentUser");
+  let users = JSON.parse(localStorage.getItem("users"));
+  let user = users[phone];
+
+  let rewardTypes = ["Cash", "Coupon", "Bonus Points"];
+  let reward = rewardTypes[Math.floor(Math.random()*3)];
+
+  let value = Math.floor(Math.random()*20)+5;
+  user.points += value;
+  user[material] += 1;
+
+  localStorage.setItem("users", JSON.stringify(users));
+
+  alert(`🎉 Reward: ${reward} - ${value} Baht/Points`);
+  loadDashboard();
 }
 
-/* PROGRESS */
-function updateProgress(points) {
-  document.getElementById("progressFill").style.width =
-    Math.min(points, 100) + "%";
-}
-
-/* LOGOUT */
-function logout() {
+function logout(){
   localStorage.removeItem("currentUser");
-  window.location.href = "auth.html";
+  window.location="auth.html";
 }
