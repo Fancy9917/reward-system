@@ -1,25 +1,28 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Dashboard</title>
+  <title>Smart Recycle Dashboard</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body onload="loadDashboard()">
 
-<header>
+<header class="header">
   <h2>🌱 My Rewards</h2>
   <p id="userPhone"></p>
 </header>
 
 <div class="dashboard">
+
   <div class="card">
-    <h3>⭐ Points</h3>
+    <h3>⭐ Total Points</h3>
     <p id="points">0</p>
   </div>
+
   <div class="card">
-    <h3>♻ Items</h3>
+    <h3>♻ Total Items</h3>
     <p id="items">0</p>
   </div>
+
 </div>
 
 <div class="progress-box">
@@ -30,12 +33,11 @@
 </div>
 
 <div class="badges">
-  <h3>🏅 Badges</h3>
+  <h3>🏅 Rewards & Badges</h3>
   <div id="badgeList"></div>
 </div>
 
 <div style="padding:16px;">
-  <button onclick="simulateMachineInput()">Simulate Machine Input ♻️</button>
   <button class="logout" onclick="logout()">Logout</button>
 </div>
 
